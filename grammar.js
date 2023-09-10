@@ -637,7 +637,14 @@ module.exports = grammar({
       $.tuple_expression,
       $._string,
     ),
-
+    _juxtaposed_quotable: $ => choice(
+      $._array,
+      $.identifier,
+      $.curly_expression, // Only valid in macros
+      $.parenthesized_expression,
+      $.tuple_expression,
+      $._juxtaposable_string,
+    ),
     _array: $ => choice(
       $.comprehension_expression,
       $.matrix_expression,
@@ -772,7 +779,18 @@ module.exports = grammar({
       $.interpolation_expression,
       $.quote_expression,
     ),
-
+    _juxtaposable_primary_expression: $ => choice(
+      $._juxtaposed_quotable,
+      $.adjoint_expression,
+      $.broadcast_call_expression,
+      $.call_expression,
+      alias($._closed_macrocall_expression, $.macrocall_expression),
+      $.parametrized_type_expression,
+      $.field_expression,
+      $.index_expression,
+      $.interpolation_expression,
+      $.quote_expression,
+    ),
     adjoint_expression: $ => prec(PREC.postfix, seq(
       $._primary_expression,
       token.immediate("'"),
@@ -1050,7 +1068,7 @@ module.exports = grammar({
         $.float_literal,
         $.adjoint_expression,
       ),
-      $._primary_expression,
+      $._juxtaposable_primary_expression
     )),
 
     compound_assignment_expression: $ => prec.right(PREC.assign, seq(
@@ -1174,7 +1192,12 @@ module.exports = grammar({
       $.prefixed_string_literal,
       $.prefixed_command_literal,
     ),
-
+    _juxtaposable_string: $ => choice(
+      $.character_literal,
+      $.command_literal,
+      $.prefixed_string_literal,
+      $.prefixed_command_literal,
+    ),
     escape_sequence: _ => ESCAPE_SEQUENCE,
 
     character_literal: _ => token(seq(

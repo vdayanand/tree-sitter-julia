@@ -204,6 +204,8 @@ macro call expressions
 
 @assert x == y "a message"
 
+@assert x == 1 "a message"
+
 @testset "a" begin
   b = c
 end
@@ -224,6 +226,12 @@ Meta.@dump x = 1
     (macro_identifier (identifier))
     (macro_argument_list
       (binary_expression (identifier) (operator) (identifier))
+      (string_literal)))
+
+  (macrocall_expression
+    (macro_identifier (identifier))
+    (macro_argument_list
+      (binary_expression (identifier) (operator) (integer_literal))
       (string_literal)))
 
   (macrocall_expression
